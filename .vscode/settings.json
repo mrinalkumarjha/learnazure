@@ -1,5 +1,0 @@
-{
-  "dotnet.defaultSolution": "testApi.sln",
-  "appService.defaultWebAppToDeploy": "/subscriptions/61338f37-8493-419b-ab5e-b60c523dfa64/resourceGroups/LearningResource/providers/Microsoft.Web/sites/learnazure",
-  "appService.deploySubpath": "testApi\\bin\\Publish"
-}
