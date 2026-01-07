@@ -68,7 +68,8 @@ namespace testApi.Controllers
             {
                 var peekMessage = await PeekMessage();
                 string encoded = peekMessage.Body.ToString();
-                return Ok( new { messageid = peekMessage.MessageId,  body = encoded });
+                string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+                return Ok( new { messageid = peekMessage.MessageId,  body = decoded });
             }
             catch
             {
@@ -91,7 +92,8 @@ namespace testApi.Controllers
             {
                 var peekMessage = await ReceiveMessage();
                 string encoded = peekMessage.Body.ToString();
-                return Ok(new { messageid = peekMessage.MessageId, body = encoded });
+                string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+                return Ok(new { messageid = peekMessage.MessageId, body = decoded });
             }
             catch
             {
