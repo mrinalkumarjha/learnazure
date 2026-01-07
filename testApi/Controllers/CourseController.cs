@@ -27,6 +27,13 @@ namespace testApi.Controllers
 
             try
             {
+
+                var cs = _config.GetConnectionString("SqlServerDb");
+                if (string.IsNullOrEmpty(cs))
+                {
+                    throw new Exception("Connection string not found in Azure");
+                }
+
                 string sql = "SELECT * from  Course";
                 var course = await _sqlServer.ExecuteQueryAsync<Course>(sql);
                 return Ok(course);
