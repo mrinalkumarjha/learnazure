@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using testApi.Data;
+using testApi.Models;
 using testApi.Utilities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace testApi.Controllers
 {
@@ -11,12 +12,12 @@ namespace testApi.Controllers
     public class CourseController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly MyDbContext _dbContext;
+        private readonly SqlServerExample _sqlServer;
 
-        public CourseController(IConfiguration config, MyDbContext dbContext)
+        public CourseController(IConfiguration config, SqlServerExample sqlServer)
         {
             _config = config;
-            _dbContext = dbContext;
+            _sqlServer = sqlServer;
         }
 
 
@@ -24,27 +25,71 @@ namespace testApi.Controllers
         public async Task<IActionResult> GetAllCourse(CancellationToken ct)
         {
 
-            // try
-            // {
-            //     var ok = await _dbContext.Database.CanConnectAsync();
-            //     return Ok(new { db = ok });
-            // }
-            // catch (Exception ex)
-            // {
-            //     throw ex;
-            // }
+            try
+            {
+                string sql = "SELECT * from  Course";
+                var course = await _sqlServer.ExecuteQueryAsync<Course>(sql);
+                return Ok(course);
+            }
+            catch (System.Exception)
+            {
 
+                throw;
+            }
+
+
+        }
+
+
+        [HttpPost("course")]
+        public async Task<IActionResult> AddCourse(string courseName, string courseDesc)
+        {
 
             try
             {
-                string baseConn = _config.GetConnectionString("Sql");
-                using SqlConnection conn = await SqlConnectionFactory.CreateAsync(baseConn, ct);
+                const string sql = @"INSERT INTO Course (Name, Description) VALUES (@Name, @Description)";
 
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT TOP (1) name FROM sys.tables ORDER BY name";
-                var name = (string?)await cmd.ExecuteScalarAsync(ct);
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Name", courseName ?? (object)DBNull.Value),
+                    new SqlParameter("@Description", courseDesc ?? (object)DBNull.Value)
+                };
 
-                return Ok(new { table = name ?? "(none)" });
+                var rows = await _sqlServer.ExecuteNonQueryAsync(sql, parameters);
+
+                if (rows == 0)
+                    return BadRequest("Insert failed");
+
+                return Ok("Course inserted successfully");
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        [HttpDelete("course")]
+        public async Task<IActionResult> DeleteCourse(int courseId)
+        {
+
+            try
+            {
+                const string sql = @"Delete from Course where courseId = @courseId";
+
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@courseId", courseId)
+                };
+
+                var rows = await _sqlServer.ExecuteNonQueryAsync(sql, parameters);
+
+                if (rows == 0)
+                    return BadRequest("Delete failed");
+
+                return Ok("Course deleted successfully");
             }
             catch (System.Exception)
             {

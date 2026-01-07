@@ -1,36 +1,27 @@
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Data.SqlClient;
-using testApi.Data;
 using Microsoft.EntityFrameworkCore;
+using testApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Register SqlServerExample
+builder.Services.AddScoped<SqlServerExample>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("SqlServerDb");
+
+    return new SqlServerExample(connectionString);
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DbContext with Entra token
-// builder.Services.AddDbContext<MyDbContext>(static async (sp, options) =>
-// {
-//     var cfg = sp.GetRequiredService<IConfiguration>();
-//     var baseConn = cfg.GetConnectionString("Sql");
-
-//     var credential = new DefaultAzureCredential();
-//     var token = await credential.GetTokenAsync(
-//         new TokenRequestContext(new[] { "https://database.windows.net/.default" }));
-
-//     var sqlConn = new SqlConnection(baseConn) { AccessToken = token.Token };
-
-//     options.UseSqlServer(sqlConn, sql =>
-//     {
-//         // Recommended for transient network errors (App Service ↔ SQL)
-//         sql.EnableRetryOnFailure();
-//     });
-// });
 
 
 
