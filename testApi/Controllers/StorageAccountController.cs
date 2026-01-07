@@ -114,7 +114,7 @@ namespace testApi.Controllers
         [NonAction]
         public async Task<PeekedMessage> PeekMessage()
         {
-            QueueClient queueClient = new QueueClient(storageConnectionString, queueName);
+            QueueClient queueClient = new QueueClient(storageConnectionString, queueName, new QueueClientOptions { MessageEncoding=QueueMessageEncoding.Base64});
             PeekedMessage peekMessage = await queueClient.PeekMessageAsync();
             return peekMessage;
             
