@@ -10,6 +10,7 @@ namespace testApi.Controllers
     /// <summary>
     /// Service bus is enterprise message broaker.  here we get two option either we can create Service bus queue or we can create Service Bus Topic also here. topic will be subscribed
     /// by many subscriber. when in case of topic when a publisher send message all the module which is subscribed to topic will get message.
+    /// in service bus queue we manually receive message but in topic you subscribe to it. once you subscribe you will automatically get message.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
